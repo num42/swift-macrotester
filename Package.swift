@@ -3,7 +3,7 @@
 
 import PackageDescription
 
-let name = String(#filePath.split(separator: "/").reversed()[1])
+let name = "swift-macrotester"
 
 let package = Package(
   name: name,
