@@ -3,7 +3,7 @@
 
 import PackageDescription
 
-let name = "swift-macrotester"
+let name = "MacroTester"
 
 let package = Package(
   name: name,
