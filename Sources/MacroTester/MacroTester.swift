@@ -6,7 +6,7 @@ public struct MacroTester {
   public static func testMacro(
     test: String = #function, filePath: String = #filePath, macros: [String: Macro.Type]
   ) {
-    let testName =    test.replacingOccurrences(of: "()", with: "")
+    let testName = test.replacingOccurrences(of: "()", with: "")
 
     assertMacroExpansion(
       inputSourceCode(for: testName, filePath: filePath),
