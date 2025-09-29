@@ -1,4 +1,4 @@
 #!/bin/sh
 set -e
 
-swift format --recursive --in-place
+swift-format format --recursive --in-place .
