@@ -1,6 +1,7 @@
 import Foundation
 import SwiftSyntaxMacros
 import SwiftSyntaxMacrosTestSupport
+import Testing
 
 /// A lightweight helper to test Swift macro expansions using file-based fixtures.
 ///
@@ -39,65 +40,50 @@ public struct MacroTester {
     macros: [String: Macro.Type],
     file: StaticString = #filePath,
     line: UInt = #line
-  ) throws {
+  ) {
     let testName = test.replacing("()", with: "")
 
-    let input = try inputSourceCode(
-      for: testName,
-      filePath: filePath
-    )
+    var input: String?
+    var output: String?
+    
+    do {
+        input = try sourceCode(
+          fileName: "Input",
+          test: testName,
+          filePath: filePath
+        )
+        
+        output = try sourceCode(
+          fileName: "Output",
+          test: testName,
+          filePath: filePath
+        )
+    } catch let FixtureError.missingFile(path, _) {
+        Issue.record("Did not find file at \(path)")
+        return
+    } catch {
+        Issue.record("Unexpected error while loading fixtures for test \(testName): \(error)")
+        return
+    }
 
-    let expected = try outputSourceCode(
-      for: testName,
-      filePath: filePath
-    )
-
+    guard let input else {
+      return
+    }
+      
+    guard let output else {
+      return
+    }
+    
     assertMacroExpansion(
       input,
-      expandedSource: expected,
+      expandedSource: output,
       macros: macros,
       file: file,
       line: line
     )
   }
 
-  /// Load the contents of `Input.swift.test` for the given test name.
-  ///
-  /// - Parameters:
-  ///   - test: The test name (folder under `Resources`).
-  ///   - filePath: The path of the calling test source file used to resolve the fixture directory.
-  /// - Returns: The input source code as a `String`.
-  private static func inputSourceCode(
-    for test: String,
-    filePath: String
-  ) throws -> String {
-    try sourceCode(
-      fileName: "Input",
-      test: test,
-      filePath: filePath
-    )
-  }
-
-  /// Load the contents of `Output.swift.test` for the given test name.
-  ///
-  /// - Parameters:
-  ///   - test: The test name (folder under `Resources`).
-  ///   - filePath: The path of the calling test source file used to resolve the fixture directory.
-  /// - Returns: The expected expanded source code as a `String`.
-  private static func outputSourceCode(
-    for test: String,
-    filePath: String
-  ) throws -> String {
-    try sourceCode(
-      fileName: "Output",
-      test: test,
-      filePath: filePath
-    )
-  }
-
   /// Load a fixture file from the path:
-  ///
-  /// `dir(#filePath)/Resources/<test>/<fileName>.swift.test`
   ///
   /// Throws error if the file cannot be read.
   ///
@@ -110,7 +96,7 @@ public struct MacroTester {
     fileName: String,
     test: String,
     filePath: String
-  ) throws -> String {
+  ) throws(FixtureError) -> String? {
     let url = URL(fileURLWithPath: filePath)
       .deletingLastPathComponent()
       .appendingPathComponent("Resources")
