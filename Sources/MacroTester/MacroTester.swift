@@ -41,7 +41,7 @@ public struct MacroTester {
     file: StaticString = #filePath,
     line: UInt = #line
   ) {
-    let testName = test.replacing("()", with: "")
+    let testName = test.replacingOccurrences(of: "()", with: "")
 
     var input: String?
     var output: String?
