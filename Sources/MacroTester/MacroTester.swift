@@ -58,11 +58,12 @@ public struct MacroTester {
         test: testName,
         filePath: filePath
       )
-    } catch let FixtureError.missingFile(path) {
-      Issue.record("Did not find file at \(path)")
-      return
     } catch {
-      Issue.record("Unexpected error while loading fixtures for test \(testName): \(error)")
+      switch error {
+      case .missingFile(let path):
+        Issue.record("Did not find file at \(path)")
+      }
+
       return
     }
 
