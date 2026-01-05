@@ -106,7 +106,7 @@ public struct MacroTester {
     do {
       return try String(contentsOf: url, encoding: .utf8)
     } catch {
-      throw FixtureError.missingFile(path: url.path, underlying: error)
+      throw FixtureError.missingFile(path: url.path)
     }
   }
 }
