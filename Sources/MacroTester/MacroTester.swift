@@ -45,35 +45,35 @@ public struct MacroTester {
 
     var input: String?
     var output: String?
-    
+
     do {
-        input = try sourceCode(
-          fileName: "Input",
-          test: testName,
-          filePath: filePath
-        )
-        
-        output = try sourceCode(
-          fileName: "Output",
-          test: testName,
-          filePath: filePath
-        )
+      input = try sourceCode(
+        fileName: "Input",
+        test: testName,
+        filePath: filePath
+      )
+
+      output = try sourceCode(
+        fileName: "Output",
+        test: testName,
+        filePath: filePath
+      )
     } catch let FixtureError.missingFile(path, _) {
-        Issue.record("Did not find file at \(path)")
-        return
+      Issue.record("Did not find file at \(path)")
+      return
     } catch {
-        Issue.record("Unexpected error while loading fixtures for test \(testName): \(error)")
-        return
+      Issue.record("Unexpected error while loading fixtures for test \(testName): \(error)")
+      return
     }
 
     guard let input else {
       return
     }
-      
+
     guard let output else {
       return
     }
-    
+
     assertMacroExpansion(
       input,
       expandedSource: output,
