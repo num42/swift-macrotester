@@ -12,7 +12,7 @@ env:
 
 jobs:
   test:
-    runs-on: macos-26
+    runs-on: macos-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -20,7 +20,7 @@ jobs:
       - name: Test Build
         run: swift build -Xswiftc -warnings-as-errors --enable-experimental-prebuilts
   format:
-    runs-on: macos-26
+    runs-on: macos-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
