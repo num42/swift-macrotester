@@ -33,27 +33,31 @@ public struct MacroTester {
   ///               resolve the `Resources` folder next to the test file.
   ///   - macros: A dictionary mapping the macro name as it appears in source (e.g. `"AutoInit"`,
   ///             `"stringify"`) to its corresponding macro type.
-  ///
-  /// - Important: This helper force-unwraps fixture loading. If a file is missing or unreadable,
-  ///              the test will crash. Ensure both `Input.swift.test` and `Output.swift.test` exist
-  ///              under the expected folder for the given test name.
   public static func testMacro(
     test: String = #function,
     filePath: String = #filePath,
-    macros: [String: Macro.Type]
-  ) {
-    let testName = test.replacingOccurrences(of: "()", with: "")
+    macros: [String: Macro.Type],
+    file: StaticString = #filePath,
+    line: UInt = #line
+  ) throws {
+    let testName = test.replacing("()", with: "")
+
+    let input = try inputSourceCode(
+      for: testName,
+      filePath: filePath
+    )
+
+    let expected = try outputSourceCode(
+      for: testName,
+      filePath: filePath
+    )
 
     assertMacroExpansion(
-        inputSourceCode(
-            for: testName,
-            filePath: filePath
-        ),
-        expandedSource: outputSourceCode(
-            for: testName,
-            filePath: filePath
-        ),
-      macros: macros
+      input,
+      expandedSource: expected,
+      macros: macros,
+      file: file,
+      line: line
     )
   }
 
@@ -64,14 +68,14 @@ public struct MacroTester {
   ///   - filePath: The path of the calling test source file used to resolve the fixture directory.
   /// - Returns: The input source code as a `String`.
   private static func inputSourceCode(
-      for test: String,
-      filePath: String
-  ) -> String {
-      sourceCode(
-        fileName: "Input",
-        test: test,
-        filePath: filePath
-      )
+    for test: String,
+    filePath: String
+  ) throws -> String {
+    try sourceCode(
+      fileName: "Input",
+      test: test,
+      filePath: filePath
+    )
   }
 
   /// Load the contents of `Output.swift.test` for the given test name.
@@ -81,39 +85,42 @@ public struct MacroTester {
   ///   - filePath: The path of the calling test source file used to resolve the fixture directory.
   /// - Returns: The expected expanded source code as a `String`.
   private static func outputSourceCode(
-      for test: String,
-      filePath: String
-  ) -> String {
-      sourceCode(
-        fileName: "Output",
-        test: test,
-        filePath: filePath
-      )
+    for test: String,
+    filePath: String
+  ) throws -> String {
+    try sourceCode(
+      fileName: "Output",
+      test: test,
+      filePath: filePath
+    )
   }
 
   /// Load a fixture file from the path:
   ///
   /// `dir(#filePath)/Resources/<test>/<fileName>.swift.test`
   ///
-  /// Uses `try!` and will crash if the file cannot be read. If you prefer graceful failures,
-  /// consider changing this to `throws` and surfacing a clearer error.
+  /// Throws error if the file cannot be read.
   ///
   /// - Parameters:
   ///   - fileName: The base name of the fixture file (e.g., `"Input"` or `"Output"`).
   ///   - test: The test name (folder under `Resources`).
   ///   - filePath: The path of the calling test source file used to resolve the fixture directory.
-  /// - Returns: The file contents as a `String`. 
+  /// - Returns: The file contents as a `String`.
   private static func sourceCode(
-      fileName: String,
-      test: String,
-      filePath: String
-  ) -> String {
-    try! String(
-      contentsOf: URL(fileURLWithPath: filePath)
-        .deletingLastPathComponent()
-        .appendingPathComponent("Resources")
-        .appendingPathComponent(test)
-        .appendingPathComponent("\(fileName).swift.test")
-    )
+    fileName: String,
+    test: String,
+    filePath: String
+  ) throws -> String {
+    let url = URL(fileURLWithPath: filePath)
+      .deletingLastPathComponent()
+      .appendingPathComponent("Resources")
+      .appendingPathComponent(test)
+      .appendingPathComponent("\(fileName).swift.test")
+
+    do {
+      return try String(contentsOf: url, encoding: .utf8)
+    } catch {
+      throw FixtureError.missingFile(path: url.path, underlying: error)
+    }
   }
 }

@@ -7,7 +7,7 @@ let name = "MacroTester"
 
 let package = Package(
   name: name,
-  platforms: [.macOS(.v12), .iOS(.v13), .tvOS(.v13), .watchOS(.v6), .macCatalyst(.v13)],
+  platforms: [.macOS(.v13), .iOS(.v13), .tvOS(.v13), .watchOS(.v6), .macCatalyst(.v13)],
   products: [
     .library(
       name: name,
