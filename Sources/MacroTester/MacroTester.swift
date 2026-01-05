@@ -58,7 +58,7 @@ public struct MacroTester {
         test: testName,
         filePath: filePath
       )
-    } catch let FixtureError.missingFile(path, _) {
+    } catch let FixtureError.missingFile(path) {
       Issue.record("Did not find file at \(path)")
       return
     } catch {
