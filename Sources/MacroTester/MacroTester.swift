@@ -1,6 +1,8 @@
 import Foundation
 import SwiftSyntaxMacros
 import SwiftSyntaxMacrosTestSupport
+import SwiftSyntaxMacrosGenericTestSupport
+import SwiftSyntaxMacroExpansion
 import Testing
 
 /// A lightweight helper to test Swift macro expansions using file-based fixtures.
@@ -74,13 +76,14 @@ public struct MacroTester {
     guard let output else {
       return
     }
-
+    
     assertMacroExpansion(
       input,
       expandedSource: output,
-      macros: macros,
-      file: file,
-      line: line
+      macroSpecs: macros.mapValues { macroType in
+          MacroSpec(type: macroType)
+      },
+      failureHandler: FailureHandler.instance
     )
   }
 
@@ -110,4 +113,18 @@ public struct MacroTester {
       throw FixtureError.missingFile(path: url.path)
     }
   }
+}
+
+enum FailureHandler {
+    static func instance(_ spec: TestFailureSpec) {
+        Issue.record(
+            Comment(rawValue: spec.message),
+            sourceLocation: .init(
+                fileID: spec.location.fileID,
+                filePath: spec.location.filePath,
+                line: spec.location.line,
+                column: spec.location.column
+            )
+        )
+    }
 }
