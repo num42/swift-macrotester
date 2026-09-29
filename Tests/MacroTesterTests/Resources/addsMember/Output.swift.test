@@ -1,0 +1,6 @@
+struct Value {
+
+    var added: Int {
+        1
+    }
+}

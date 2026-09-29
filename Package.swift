@@ -1,9 +1,13 @@
 // swift-tools-version:6.3
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
-import PackageDescription
+internal import PackageDescription
 
 let name = "MacroTester"
+
+let swiftSettings: [SwiftSetting] = [
+  .enableUpcomingFeature("InternalImportsByDefault")
+]
 
 let package = Package(
   name: name,
@@ -21,9 +25,21 @@ let package = Package(
     .target(
       name: name,
       dependencies: [
-        .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax"),
+        .product(name: "SwiftSyntaxMacroExpansion", package: "swift-syntax"),
         .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
-      ]
-    )
+        .product(name: "SwiftSyntaxMacrosGenericTestSupport", package: "swift-syntax"),
+      ],
+      swiftSettings: swiftSettings
+    ),
+    .testTarget(
+      name: "\(name)Tests",
+      dependencies: [
+        .target(name: name),
+        .product(name: "SwiftSyntax", package: "swift-syntax"),
+        .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
+      ],
+      resources: [.copy("Resources")],
+      swiftSettings: swiftSettings
+    ),
   ]
 )
