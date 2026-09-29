@@ -1,13 +1,12 @@
-import Foundation
-import SwiftSyntaxMacroExpansion
-import SwiftSyntaxMacros
-import SwiftSyntaxMacrosGenericTestSupport
-import SwiftSyntaxMacrosTestSupport
-import Testing
+internal import Foundation
+internal import SwiftSyntaxMacroExpansion
+public import SwiftSyntaxMacros
+internal import SwiftSyntaxMacrosGenericTestSupport
+internal import Testing
 
 /// A lightweight helper to test Swift macro expansions using file-based fixtures.
 ///
-/// `MacroTester` wraps `assertMacroExpansion` from `SwiftSyntaxMacrosTestSupport` and
+/// `MacroTester` wraps `assertMacroExpansion` from `SwiftSyntaxMacrosGenericTestSupport` and
 /// loads fixtures from disk based on the calling test function name. It expects a
 /// `Resources/<TestName>/` folder next to the test source file, containing
 /// `Input.swift.test` and `Output.swift.test`.
@@ -77,7 +76,7 @@ public struct MacroTester {
       return
     }
 
-    assertMacroExpansion(
+    SwiftSyntaxMacrosGenericTestSupport.assertMacroExpansion(
       input,
       expandedSource: output,
       macroSpecs: macros.mapValues { macroType in
