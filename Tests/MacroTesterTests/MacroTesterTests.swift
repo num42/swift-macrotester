@@ -23,37 +23,4 @@ struct MacroTesterTests {
   @Test func addsMember() {
     MacroTester.testMacro(macros: testMacros)
   }
-
-  @Test func assertMacroExpansionPasses() {
-    MacroTester.assertMacroExpansion(
-      """
-      @AddsMember
-      struct Value {}
-      """,
-      expandedSource: """
-        struct Value {
-
-            var added: Int {
-                1
-            }
-        }
-        """,
-      macros: testMacros
-    )
-  }
-
-  @Test func assertMacroExpansionRecordsFailures() {
-    withKnownIssue {
-      MacroTester.assertMacroExpansion(
-        """
-        @AddsMember
-        struct Value {}
-        """,
-        expandedSource: """
-          struct Value {}
-          """,
-        macros: testMacros
-      )
-    }
-  }
 }

@@ -1,7 +1,7 @@
 internal import Foundation
 internal import SwiftSyntaxMacroExpansion
 public import SwiftSyntaxMacros
-public import SwiftSyntaxMacrosGenericTestSupport
+internal import SwiftSyntaxMacrosGenericTestSupport
 internal import Testing
 
 /// A lightweight helper to test Swift macro expansions using file-based fixtures.
@@ -83,39 +83,6 @@ public struct MacroTester {
         MacroSpec(type: macroType)
       },
       failureHandler: FailureHandler.instance
-    )
-  }
-
-  /// Swift Testing variant of `assertMacroExpansion`.
-  ///
-  /// The variant from `SwiftSyntaxMacrosTestSupport` reports failures through XCTest, which Swift
-  /// Testing does not treat as test failures. This variant records them with `Issue.record`.
-  ///
-  /// - Parameters:
-  ///   - originalSource: The source code containing the macro usage.
-  ///   - expandedSource: The expected source code after expansion.
-  ///   - diagnostics: The diagnostics the expansion is expected to emit.
-  ///   - macros: A dictionary mapping the macro name as it appears in source to its macro type.
-  public static func assertMacroExpansion(
-    _ originalSource: String,
-    expandedSource: String,
-    diagnostics: [DiagnosticSpec] = [],
-    macros: [String: Macro.Type],
-    fileID: StaticString = #fileID,
-    filePath: StaticString = #filePath,
-    line: UInt = #line,
-    column: UInt = #column
-  ) {
-    SwiftSyntaxMacrosGenericTestSupport.assertMacroExpansion(
-      originalSource,
-      expandedSource: expandedSource,
-      diagnostics: diagnostics,
-      macroSpecs: macros.mapValues { MacroSpec(type: $0) },
-      failureHandler: FailureHandler.instance,
-      fileID: fileID,
-      filePath: filePath,
-      line: line,
-      column: column
     )
   }
 

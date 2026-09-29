@@ -19,22 +19,6 @@ A tiny Swift library that simplifies testing Swift macros with Swift Testing. It
 }
 ```
 
-## Inline tests: `MacroTester.assertMacroExpansion`
+## Inline tests
 
-A Swift Testing variant of SwiftSyntax's `assertMacroExpansion`, for example for diagnostics. The variant in `SwiftSyntaxMacrosTestSupport` reports failures through XCTest, which Swift Testing ignores.
-
-```swift
-@Test func structThrowsError() {
-  MacroTester.assertMacroExpansion(
-    """
-    @AutoFactory
-    struct NotAClass {}
-    """,
-    expandedSource: """
-      struct NotAClass {}
-      """,
-    diagnostics: [.init(message: "@AutoFactory requires a class", line: 1, column: 1)],
-    macros: ["AutoFactory": AutoFactoryMacro.self]
-  )
-}
-```
+For inline expansion tests, for example of diagnostics, use `MacroTestHelper.assertMacroExpansion` from [swift-macrotesthelper](https://github.com/num42/swift-macrotesthelper).
